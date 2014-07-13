@@ -10,13 +10,13 @@ angular.module('ui.bootstrap.buttons', [])
   this.toggleEvent = buttonConfig.toggleEvent || 'click';
 }])
 
-.directive('btnRadio', function () {
+.directive('btnRadio', ['$parse',function ($parse) {
   return {
     require: ['btnRadio', 'ngModel'],
     controller: 'ButtonsController',
     link: function (scope, element, attrs, ctrls) {
       var buttonsCtrl = ctrls[0], ngModelCtrl = ctrls[1];
-
+      var setNgModel = $parse(attrs.ngModel).assign;
       //model -> UI
       ngModelCtrl.$render = function () {
         element.toggleClass(buttonsCtrl.activeClass, angular.equals(ngModelCtrl.$modelValue, scope.$eval(attrs.btnRadio)));
@@ -30,12 +30,13 @@ angular.module('ui.bootstrap.buttons', [])
           scope.$apply(function () {
             ngModelCtrl.$setViewValue(isActive ? null : scope.$eval(attrs.btnRadio));
             ngModelCtrl.$render();
+            setNgModel(scope.$parent, scope.$eval(attrs.btnRadio));/// Force to Change Ng-Model in $scope
           });
         }
       });
     }
   };
-})
+}])
 
 .directive('btnCheckbox', function () {
   return {
